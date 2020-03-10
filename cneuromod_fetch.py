@@ -22,7 +22,6 @@ def get_files(base_path):
     print("Getting files")
     print(base_path)
 
-    
     for r, dirs, files in os.walk(base_path):
 
         for f in files:
@@ -98,7 +97,7 @@ def generate_index(dataset):
         try:
             sub = file.split("/")[1]
             ses = file.split("/")[2]
-            ses = ses.replace("vid", "") 
+            ses = ses.replace("vid", "")
 
             run = "run-" + re.search(".*/.*run-(.*?)_.*", file).group(1)
             nii_file = file.split("_")[-1].split(".")[0]
@@ -117,25 +116,6 @@ def generate_index(dataset):
     return index
 
 
-def get_max(files):
-
-    runs = []
-    sessions = []
-    for file in files:
-        try:
-            ses = file.split("/")[2]
-            run = re.search(".*/.*run-(.*?)_.*", file).group(1)
-
-            runs.append(int(run))
-            ses = ses.replace("ses-vid", "")
-            sessions.append(int(ses))
-
-        except AttributeError as e:
-            if "anat" not in file:
-                print(file)
-                print(e)
-
-    return max(runs), max(sessions)
 
 
 def cneuromod_fetch(
@@ -161,8 +141,5 @@ def cneuromod_fetch(
     return nii_files
 
 
-# print(cneuromod_fetch(datasets = ["movie10","hcptrt"]))
-#generate_index("hcptrt")
-#print(cneuromod_fetch(datasets = ["movie10","hcptrt"]))
-
+print(cneuromod_fetch(subjects = ["sub-02","sub-03"],datasets=["movie10", "hcptrt"]))
 
