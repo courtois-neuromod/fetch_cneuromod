@@ -158,23 +158,15 @@ def cneuromod_fetch(
 
         if subjects[0] == "all":
             subjects = index.keys()
-        else:
-            subjects = subjects
 
         if sessions[0] == "all":
             sessions = index["sub-01"].keys()
-        else:
-            sessions = sessions
 
         if runs[0] == "all":
             runs = index["sub-01"]["ses-001"].keys()
-        else:
-            runs = runs
 
         if images[0] == "all":
             images = index["sub-01"]["ses-001"]["run-01"].keys()
-        else:
-            images = images
 
         files_paths = _cneuromod_fetch_helper(subjects, sessions, runs, images, dataset)
         output[dataset] = files_paths
@@ -182,4 +174,4 @@ def cneuromod_fetch(
     return output
 
 
-#print(cneuromod_fetch(subjects=["sub-02", "sub-01", "sub-06"], datasets=["movie10", "hcptrt"]))
+# print(cneuromod_fetch(subjects=["sub-02", "sub-01", "sub-06"], datasets=["movie10", "hcptrt"])):
