@@ -74,11 +74,28 @@ def _empty_index(max_run, max_session, datasets):
 
                 nii_files = ["mask", "boldref", "bold"]
                 for nii in nii_files:
+                    index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii] = dict()
 
                     if datasets == "movie10":
-                        index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii] = ""
+                        index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii][
+                            "placeholder"
+                        ] = ""
                     elif datasets == "hcptrt":
-                        index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii] = ""
+                        tasks = [
+                            "emotion",
+                            "gambling",
+                            "language",
+                            "motor",
+                            "relational",
+                            "social",
+                            "wm",
+                            "restingstate",
+                        ]
+
+                        for task in tasks:
+                            index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii][
+                                task
+                            ] = ""
 
             index["sub-0" + str(i)]["anat"] = []
     return index
@@ -86,10 +103,8 @@ def _empty_index(max_run, max_session, datasets):
 
 def generate_index(dataset):
 
-    files, max_run, max_session = get_files(datasets[dataset])
-    #    max_run, max_session = get_max(files)
-
-    index = empty_index(max_run, max_session, dataset)
+    files, max_run, max_session = _get_files(datasets_dict[dataset])
+    index = _empty_index(max_run, max_session, dataset)
 
     print("Generating index")
     run_set = set()
@@ -101,15 +116,18 @@ def generate_index(dataset):
             ses = ses.replace("vid", "")
 
             run = "run-" + re.search(".*/.*run-(.*?)_.*", file).group(1)
+
+            task = re.search(".*/.*task-(.*?)_.*", file).group(1)
+
             nii_file = file.split("_")[-1].split(".")[0]
 
-            index[sub][ses][run][nii_file] = file
+            index[sub][ses][run][nii_file][task] = file
 
         except AttributeError as e:
-            if "anat" not in file:
-                raise AttributeError
+            if "anat" not in file and "rec-moco" not in file:
                 print(file)
                 print(e)
+                raise AttributeError
 
     path = "index/index_" + dataset + ".json"
     with open(path, "w") as f:
@@ -124,24 +142,27 @@ def _cneuromod_fetch_helper(
     runs=["run-01"],
     images=["bold"],
     dataset="movie10",
+    tasks=["restingstate"],
 ):
 
-    nii_files = dict()
+    nii_files_dict = dict()
+    nii_files_list = []
     for sub in subjects:
-        nii_files[sub] = dict()
+        nii_files_dict[sub] = dict()
         for sess in sessions:
-            nii_files[sub][sess] = dict()
+            nii_files_dict[sub][sess] = dict()
             for run in runs:
-                nii_files[sub][sess][run] = dict()
+                nii_files_dict[sub][sess][run] = dict()
                 for image in images:
-                    nii_files[sub][sess][run][image] = ""
+                    nii_files_dict[sub][sess][run][image] = ""
                     path = "index/index_" + dataset + ".json"
                     with open(path, "r") as f:
                         index = json.load(f)
 
-                    nii_files[sub][sess][run][image] = index[sub][sess][run][image]
+                    nii_files_dict[sub][sess][run][image] = index[sub][sess][run][image]
+                    nii_files_list.append(index[sub][sess][run][image])
 
-    return nii_files
+    return nii_files_dict, nii_files_list
 
 
 def cneuromod_fetch(
@@ -150,9 +171,13 @@ def cneuromod_fetch(
     runs=["run-01"],
     images=["bold"],
     datasets=["movie10"],
+    tasks=["restingstate"],
+    files=False,
 ):
 
     output = dict()
+
+    datasets_files = []
 
     for dataset in datasets:
 
@@ -168,10 +193,25 @@ def cneuromod_fetch(
         if images[0] == "all":
             images = index["sub-01"]["ses-001"]["run-01"].keys()
 
-        files_paths = _cneuromod_fetch_helper(subjects, sessions, runs, images, dataset)
-        output[dataset] = files_paths
+        if tasks[0] == "all":
+            tasks = index["sub-01"]["ses-001"]["run-01"]["restingstate"].keys()
+
+        files_paths_dict, files_list = _cneuromod_fetch_helper(
+            subjects, sessions, runs, images, dataset, tasks
+        )
+
+        datasets_files.append(files_list)
+
+        output[dataset] = files_paths_dict
+    if files:
+        output = datasets_files
 
     return output
 
 
-# print(cneuromod_fetch(subjects=["sub-02", "sub-01", "sub-06"], datasets=["movie10", "hcptrt"])):
+generate_index("hcptrt")
+# print(
+#    cneuromod_fetch(
+#        subjects=["sub-02", "sub-01", "sub-06"], datasets=["movie10", "hcptrt"]
+#    )
+# )
