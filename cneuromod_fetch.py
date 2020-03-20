@@ -96,8 +96,6 @@ def _empty_index(max_run, max_session, datasets):
                             index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii][
                                 task
                             ] = ""
-
-            index["sub-0" + str(i)]["anat"] = []
     return index
 
 
@@ -137,11 +135,12 @@ def generate_index(dataset):
 
 
 def _cneuromod_fetch_helper(
+    index,
     subjects=["sub-01"],
     sessions=["ses-001"],
     runs=["run-01"],
     images=["bold"],
-    dataset="movie10",
+    dataset="hcptrt",
     tasks=["restingstate"],
 ):
 
@@ -154,13 +153,14 @@ def _cneuromod_fetch_helper(
             for run in runs:
                 nii_files_dict[sub][sess][run] = dict()
                 for image in images:
-                    nii_files_dict[sub][sess][run][image] = ""
-                    path = "index/index_" + dataset + ".json"
-                    with open(path, "r") as f:
-                        index = json.load(f)
+                    nii_files_dict[sub][sess][run][image] = dict()
+                    for task in tasks:
 
-                    nii_files_dict[sub][sess][run][image] = index[sub][sess][run][image]
-                    nii_files_list.append(index[sub][sess][run][image])
+                        nii_file = index[sub][sess][run][image][task]
+
+                        if nii_file != "":
+                            nii_files_list.append(nii_file)
+                            nii_files_dict[sub][sess][run][image][task] = nii_file
 
     return nii_files_dict, nii_files_list
 
@@ -168,11 +168,11 @@ def _cneuromod_fetch_helper(
 def cneuromod_fetch(
     subjects=["sub-01"],
     sessions=["ses-001"],
-    runs=["run-01"],
+    runs=["all"],
     images=["bold"],
-    datasets=["movie10"],
-    tasks=["restingstate"],
-    files=False,
+    datasets=["hcptrt"],
+    tasks=["all"],
+    list_out=False,
 ):
 
     output = dict()
@@ -180,6 +180,10 @@ def cneuromod_fetch(
     datasets_files = []
 
     for dataset in datasets:
+
+        path = "index/index_" + dataset + ".json"
+        with open(path, "r") as f:
+            index = json.load(f)
 
         if subjects[0] == "all":
             subjects = index.keys()
@@ -194,24 +198,15 @@ def cneuromod_fetch(
             images = index["sub-01"]["ses-001"]["run-01"].keys()
 
         if tasks[0] == "all":
-            tasks = index["sub-01"]["ses-001"]["run-01"]["restingstate"].keys()
+            tasks = index["sub-01"]["ses-001"]["run-01"]["bold"].keys()
 
-        files_paths_dict, files_list = _cneuromod_fetch_helper(
-            subjects, sessions, runs, images, dataset, tasks
+        files_dict, files_list = _cneuromod_fetch_helper(
+            index, subjects, sessions, runs, images, dataset, tasks
         )
 
-        datasets_files.append(files_list)
-
-        output[dataset] = files_paths_dict
-    if files:
-        output = datasets_files
+        if list_out:
+            output[dataset] = files_list
+        else:
+            output[dataset] = files_dict
 
     return output
-
-
-generate_index("hcptrt")
-# print(
-#    cneuromod_fetch(
-#        subjects=["sub-02", "sub-01", "sub-06"], datasets=["movie10", "hcptrt"]
-#    )
-# )
