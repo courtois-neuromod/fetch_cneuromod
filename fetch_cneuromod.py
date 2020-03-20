@@ -172,7 +172,7 @@ def cneuromod_fetch(
     images=["bold"],
     datasets=["hcptrt"],
     tasks=["all"],
-    list_out=False,
+    list_out=True,
 ):
 
     output = dict()
