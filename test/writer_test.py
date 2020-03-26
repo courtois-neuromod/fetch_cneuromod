@@ -1,4 +1,4 @@
-from fetch_cneuromod import cneuromod_fetch
+from fetch_cneuromod import fetch_cneuromod
 import json
 
 path = "index/index_hcptrt.json"
@@ -8,7 +8,7 @@ with open(path, "r") as f:
 
 with open("test_fetch_cneuromod.py", "w") as test_writer:
 
-    test_writer.write("from fetch_cneuromod import cneuromod_fetch \n")
+    test_writer.write("from fetch_cneuromod import fetch_cneuromod \n")
 
     subjects = ["sub-05,sub-06,sub-01", "sub-03", "sub-06"]
     sessions = ["ses-001", "ses-002", "ses-001,ses-002", "ses-007"]
@@ -75,7 +75,7 @@ with open("test_fetch_cneuromod.py", "w") as test_writer:
                         )
 
                         function_test = (
-                            "cneuromod_fetch(subjects = [%s], sessions=[%s], runs = [%s], images = [%s], tasks = [%s])"
+                            "fetch_cneuromod(subjects = [%s], sessions=[%s], runs = [%s], images = [%s], tasks = [%s])"
                             % (
                                 sub_in_str,
                                 sess_in_str,
@@ -86,7 +86,7 @@ with open("test_fetch_cneuromod.py", "w") as test_writer:
                         )
 
                         function_out = str(
-                            cneuromod_fetch(
+                            fetch_cneuromod(
                                 subjects=sub_in,
                                 sessions=sess_in,
                                 runs=run_in,

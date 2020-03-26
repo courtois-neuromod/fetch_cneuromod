@@ -134,7 +134,7 @@ def generate_index(dataset):
     return index
 
 
-def _cneuromod_fetch_helper(
+def _fetch_cneuromod_helper(
     index,
     subjects=["sub-01"],
     sessions=["ses-001"],
@@ -165,7 +165,7 @@ def _cneuromod_fetch_helper(
     return nii_files_dict, nii_files_list
 
 
-def cneuromod_fetch(
+def fetch_cneuromod(
     subjects=["sub-01"],
     sessions=["ses-001"],
     runs=["all"],
@@ -200,7 +200,7 @@ def cneuromod_fetch(
         if tasks[0] == "all":
             tasks = index["sub-01"]["ses-001"]["run-01"]["bold"].keys()
 
-        files_dict, files_list = _cneuromod_fetch_helper(
+        files_dict, files_list = _fetch_cneuromod_helper(
             index, subjects, sessions, runs, images, dataset, tasks
         )
 
