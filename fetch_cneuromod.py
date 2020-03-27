@@ -14,20 +14,21 @@ datasets_dict[
 ] = "/data/neuromod/DATA/cneuromod/hcptrt/derivatives/fmriprep1.5.0/fmriprep"
 
 
-def _get_files(base_path):
+def _get_files(base_path,verbose=True):
     nii_files = []
     runs = []
     sessions = []
 
-    print("Getting files")
-    print(base_path)
+    if(verbose):
+        print("Getting files")
+        print(base_path)
 
-    for r, dirs, files in os.walk(base_path):
+    for root, dirs, files in os.walk(base_path):
 
-        for f in files:
-            if ".nii" in f:
+        for fname in files:
+            if ".nii" in fname:
 
-                func = os.path.join(r, f)
+                func = os.path.join(root, fname)
                 func = func.replace(base_path, "")
                 nii_files.append(func)
 
@@ -42,42 +43,43 @@ def _get_files(base_path):
 
                     sessions.append(int(ses))
 
-                except AttributeError as e:
-                    if "anat" not in func:
+                except AttributeError as error:
+                    if "anat" not in func and verbose:
                         raise AttributeError
                         print(func)
-                        print(e)
+                        print(error)
 
     return nii_files, max(runs), max(sessions)
 
 
-def _empty_index(max_run, max_session, datasets):
-    print("Creating Empty Index")
+def _empty_index(max_run, max_session, datasets, verbose=True):
+    if(verbose):
+        print("Creating Empty Index")
     index = dict()
-    for i in range(1, 7):
-        index["sub-0" + str(i)] = dict()
-        for s in range(1, max_session + 1):
-            s = "%02d" % s
+    for sub in range(1, 7):
+        index["sub-0" + str(sub)] = dict()
+        for sess in range(1, max_session + 1):
+            sess = "%02d" % sess
 
             if datasets == "movie10":
-                index["sub-0" + str(i)]["ses-0" + s] = dict()
+                index["sub-0" + str(sub)]["ses-0" + sess] = dict()
             elif datasets == "hcptrt":
-                index["sub-0" + str(i)]["ses-0" + s] = dict()
+                index["sub-0" + str(sub)]["ses-0" + sess] = dict()
 
-            for r in range(1, max_run + 1):
-                r = "%02d" % r
+            for run in range(1, max_run + 1):
+                run = "%02d" % run
 
                 if datasets == "movie10":
-                    index["sub-0" + str(i)]["ses-0" + s]["run-" + r] = dict()
+                    index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run] = dict()
                 elif datasets == "hcptrt":
-                    index["sub-0" + str(i)]["ses-0" + s]["run-" + r] = dict()
+                    index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run] = dict()
 
                 nii_files = ["mask", "boldref", "bold"]
                 for nii in nii_files:
-                    index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii] = dict()
+                    index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][nii] = dict()
 
                     if datasets == "movie10":
-                        index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii][
+                        index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][nii][
                             "placeholder"
                         ] = ""
                     elif datasets == "hcptrt":
@@ -93,18 +95,19 @@ def _empty_index(max_run, max_session, datasets):
                         ]
 
                         for task in tasks:
-                            index["sub-0" + str(i)]["ses-0" + s]["run-" + r][nii][
+                            index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][nii][
                                 task
                             ] = ""
     return index
 
 
-def generate_index(dataset):
+def generate_index(dataset, verbose=True):
 
     files, max_run, max_session = _get_files(datasets_dict[dataset])
     index = _empty_index(max_run, max_session, dataset)
 
-    print("Generating index")
+    if(verbose):
+        print("Generating index")
     run_set = set()
     for file in files:
 
@@ -121,15 +124,15 @@ def generate_index(dataset):
 
             index[sub][ses][run][nii_file][task] = file
 
-        except AttributeError as e:
-            if "anat" not in file and "rec-moco" not in file:
+        except AttributeError as error:
+            if "anat" not in file and "rec-moco" not in file and verbose:
                 print(file)
-                print(e)
+                print(error)
                 raise AttributeError
 
     path = "index/index_" + dataset + ".json"
-    with open(path, "w") as f:
-        json.dump(index, f)
+    with open(path, "w") as fname:
+        json.dump(index, fname)
 
     return index
 
@@ -182,8 +185,8 @@ def fetch_cneuromod(
     for dataset in datasets:
 
         path = "index/index_" + dataset + ".json"
-        with open(path, "r") as f:
-            index = json.load(f)
+        with open(path, "r") as fname:
+            index = json.load(fname)
 
         if subjects[0] == "all":
             subjects = index.keys()
