@@ -14,15 +14,15 @@ datasets_dict[
 ] = "/data/neuromod/DATA/cneuromod/hcptrt/derivatives/fmriprep1.5.0/fmriprep"
 
 
-def _get_files(base_path,verbose=True):
-    
+def _get_files(base_path, verbose=True):
+
     """ Get a list of files in a directory
     """
     nii_files = []
     runs = []
     sessions = []
 
-    if(verbose):
+    if verbose:
         print("Getting files")
         print(base_path)
 
@@ -56,9 +56,9 @@ def _get_files(base_path,verbose=True):
 
 
 def _empty_index(max_run, max_session, datasets, verbose=True):
-      """ Return an empty dictionary of dictionaries 
-      """
-    if(verbose):
+    """ Return an empty dictionary of dictionaries 
+    """
+    if verbose:
         print("Creating Empty Index")
     index = dict()
     for sub in range(1, 7):
@@ -81,7 +81,9 @@ def _empty_index(max_run, max_session, datasets, verbose=True):
 
                 nii_files = ["mask", "boldref", "bold"]
                 for nii in nii_files:
-                    index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][nii] = dict()
+                    index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][
+                        nii
+                    ] = dict()
 
                     if datasets == "movie10":
                         index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][nii][
@@ -100,9 +102,9 @@ def _empty_index(max_run, max_session, datasets, verbose=True):
                         ]
 
                         for task in tasks:
-                            index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][nii][
-                                task
-                            ] = ""
+                            index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][
+                                nii
+                            ][task] = ""
     return index
 
 
@@ -114,7 +116,7 @@ def generate_index(dataset, verbose=True):
     files, max_run, max_session = _get_files(datasets_dict[dataset])
     index = _empty_index(max_run, max_session, dataset)
 
-    if(verbose):
+    if verbose:
         print("Generating index")
     run_set = set()
     for file in files:
@@ -154,8 +156,8 @@ def _fetch_cneuromod_helper(
     dataset="hcptrt",
     tasks=["restingstate"],
 ):
-     """ helper function for fetch cneuromod
-     """
+    """ helper function for fetch cneuromod
+    """
     nii_files_dict = dict()
     nii_files_list = []
     for sub in subjects:
@@ -186,9 +188,9 @@ def fetch_cneuromod(
     tasks=["all"],
     list_out=True,
 ):
-    
-     """ Return filenames of cneuromod data given input paramters
-     """
+
+    """ Return filenames of cneuromod data given input paramters
+    """
 
     output = dict()
 
