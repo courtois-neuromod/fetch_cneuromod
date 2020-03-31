@@ -1,8 +1,6 @@
 import os
 import re
 import json
-from tqdm import tqdm
-
 
 datasets_dict = dict()
 
@@ -16,7 +14,7 @@ datasets_dict[
 
 def _get_files(base_path, verbose=True):
 
-    """ Get a list of files in a directory
+    """ Get a list of files in a directory.
     """
     nii_files = []
     runs = []
@@ -26,7 +24,7 @@ def _get_files(base_path, verbose=True):
         print("Getting files")
         print(base_path)
 
-    for root, dirs, files in os.walk(base_path):
+    for root, files in os.walk(base_path):
 
         for fname in files:
             if ".nii" in fname:
@@ -48,15 +46,15 @@ def _get_files(base_path, verbose=True):
 
                 except AttributeError as error:
                     if "anat" not in func and verbose:
-                        raise AttributeError
                         print(func)
                         print(error)
+                        raise AttributeError
 
     return nii_files, max(runs), max(sessions)
 
 
 def _empty_index(max_run, max_session, datasets, verbose=True):
-    """ Return an empty dictionary of dictionaries 
+    """ Return an empty dictionary of dictionaries.
     """
     if verbose:
         print("Creating Empty Index")
@@ -110,7 +108,7 @@ def _empty_index(max_run, max_session, datasets, verbose=True):
 
 def generate_index(dataset, verbose=True):
 
-    """ Return an index for the movie10 and hcptrt data
+    """ Return an index for the movie10 and hcptrt data.
     """
 
     files, max_run, max_session = _get_files(datasets_dict[dataset])
@@ -118,7 +116,7 @@ def generate_index(dataset, verbose=True):
 
     if verbose:
         print("Generating index")
-    run_set = set()
+
     for file in files:
 
         try:
@@ -156,7 +154,7 @@ def _fetch_cneuromod_helper(
     dataset="hcptrt",
     tasks=["restingstate"],
 ):
-    """ helper function for fetch cneuromod
+    """ Helper function for fetch_cneuromod
     """
     nii_files_dict = dict()
     nii_files_list = []
@@ -189,12 +187,10 @@ def fetch_cneuromod(
     list_out=True,
 ):
 
-    """ Return filenames of cneuromod data given input paramters
+    """ Return filenames of cneuromod data given input paramters.
     """
 
     output = dict()
-
-    datasets_files = []
 
     for dataset in datasets:
 
