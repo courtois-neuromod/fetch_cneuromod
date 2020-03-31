@@ -14,8 +14,7 @@ datasets_dict[
 
 def _get_files(base_path, verbose=True):
 
-    """ Get a list of files in a directory.
-    """
+    """ Get a list of files in a directory."""
     nii_files = []
     runs = []
     sessions = []
@@ -54,8 +53,7 @@ def _get_files(base_path, verbose=True):
 
 
 def _empty_index(max_run, max_session, datasets, verbose=True):
-    """ Return an empty dictionary of dictionaries.
-    """
+    """ Return an empty dictionary of dictionaries."""
     if verbose:
         print("Creating Empty Index")
     index = dict()
@@ -108,8 +106,7 @@ def _empty_index(max_run, max_session, datasets, verbose=True):
 
 def generate_index(dataset, verbose=True):
 
-    """ Return an index for the movie10 and hcptrt data.
-    """
+    """ Return an index for the movie10 and hcptrt data."""
 
     files, max_run, max_session = _get_files(datasets_dict[dataset])
     index = _empty_index(max_run, max_session, dataset)
@@ -154,8 +151,7 @@ def _fetch_cneuromod_helper(
     dataset="hcptrt",
     tasks=["restingstate"],
 ):
-    """ Helper function for fetch_cneuromod
-    """
+    """ Helper function for fetch_cneuromod. """
     nii_files_dict = dict()
     nii_files_list = []
     for sub in subjects:
@@ -187,8 +183,7 @@ def fetch_cneuromod(
     list_out=True,
 ):
 
-    """ Return filenames of cneuromod data given input paramters.
-    """
+    """ Return filenames of cneuromod data given input paramters."""
 
     output = dict()
 

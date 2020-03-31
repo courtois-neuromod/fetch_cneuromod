@@ -1,7 +1,5 @@
-"""
-Fetch paths for filenames from cneuromod data
-"""
+"""Fetch paths for filenames from cneuromod data."""
 
 from .fetch_cneuromod import fetch_cneuromod
-__all__ = ['fetch_cneuromod']
 
+__all__ = ["fetch_cneuromod"]
