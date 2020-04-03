@@ -1,0 +1,2 @@
+# fetch_cneuromod
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/73f505bcd34a4a2d93695dfaa52ac538)](https://app.codacy.com/gh/courtois-neuromod/fetch_cneuromod?utm_source=github.com&utm_medium=referral&utm_content=courtois-neuromod/fetch_cneuromod&utm_campaign=Badge_Grade_Dashboard)
