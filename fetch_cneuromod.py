@@ -11,6 +11,8 @@ datasets_dict[
     "hcptrt"
 ] = "/data/neuromod/DATA/cneuromod/hcptrt/derivatives/fmriprep1.5.0/fmriprep"
 
+curr_path = os.path.dirname(os.path.abspath(__file__))
+
 
 def _get_files(base_path, verbose=True):
 
@@ -23,7 +25,7 @@ def _get_files(base_path, verbose=True):
         print("Getting files")
         print(base_path)
 
-    for root, files in os.walk(base_path):
+    for root, _, files in os.walk(base_path):
 
         for fname in files:
             if ".nii" in fname:
@@ -82,9 +84,17 @@ def _empty_index(max_run, max_session, datasets, verbose=True):
                     ] = dict()
 
                     if datasets == "movie10":
-                        index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][nii][
-                            "placeholder"
-                        ] = ""
+                        tasks = [
+                            "bournesupremacy",
+                            "hiddenfigures",
+                            "life",
+                            "wolfofwallstreet",
+                        ]
+                        for task in tasks:
+                            index["sub-0" + str(sub)]["ses-0" + sess]["run-" + run][
+                                nii
+                            ][task] = ""
+
                     elif datasets == "hcptrt":
                         tasks = [
                             "emotion",
@@ -143,6 +153,7 @@ def generate_index(dataset, verbose=True):
 
 
 def _fetch_cneuromod_helper(
+    root_path,
     index,
     subjects=["sub-01"],
     sessions=["ses-001"],
@@ -167,8 +178,10 @@ def _fetch_cneuromod_helper(
                         nii_file = index[sub][sess][run][image][task]
 
                         if nii_file != "":
-                            nii_files_list.append(nii_file)
-                            nii_files_dict[sub][sess][run][image][task] = nii_file
+                            nii_files_list.append(root_path + nii_file)
+                            nii_files_dict[sub][sess][run][image][task] = (
+                                root_path + nii_file
+                            )
 
     return nii_files_dict, nii_files_list
 
@@ -189,9 +202,11 @@ def fetch_cneuromod(
 
     for dataset in datasets:
 
-        path = "index/index_" + dataset + ".json"
+        path = curr_path + "/index/index_" + dataset + ".json"
         with open(path, "r") as fname:
             index = json.load(fname)
+
+        root_path = datasets_dict[dataset]
 
         if subjects[0] == "all":
             subjects = index.keys()
@@ -209,7 +224,7 @@ def fetch_cneuromod(
             tasks = index["sub-01"]["ses-001"]["run-01"]["bold"].keys()
 
         files_dict, files_list = _fetch_cneuromod_helper(
-            index, subjects, sessions, runs, images, dataset, tasks
+            root_path, index, subjects, sessions, runs, images, dataset, tasks
         )
 
         if list_out:
